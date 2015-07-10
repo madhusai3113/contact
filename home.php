@@ -1,19 +1,28 @@
 <?php
 	session_start(); //starts the session
-	include 'config.php';
-	if(isset($_SESSION['username'])){ //checks if user is logged in
+ include 'config.php';
+	if(!$_SESSION['username']){ //checks if user is logged in
+		header('location: index.php');
 	}
-	if(isset($_POST['name'])){
+ 
+	$user = $_SESSION['username']; //assigns user value
+ 
 		$name = $_POST['name'];
 		$phone = $_POST['phone'];	
+		
 		$sql = "INSERT INTO contacts (name, phone) VALUES ('$name',  '$phone')";
-		if (mysqli_query($connection,$sql)) {
-		    echo "New contact created successfully";
+	
+		if ($connection->query($sql) === TRUE) {
+		    echo '<script>alert("Successfully Recorded");</script>';
 		} else {
 		    echo "Error: " . $sql . "<br>" .mysqli_errno();
 		}
-	}
-	mysqli_close($connection);
+unset($_POST['name']);
+unset($_POST['phone']);
+	$connection->close();
+
+	
+	
 ?>
 	
 	
@@ -134,12 +143,12 @@ h2{
 	font-family:Coronetscript, cursive;
 	font-size:30px;
 }               
-
+table{color:white;}
 
 button{
-	position:relative;
-	top:48%;
-	left:47%;
+	position:fixed;
+	top:2%;
+	right:10%;
 	background-image:url('but.gif');
 	height:47px;
 	width:113px;
@@ -149,24 +158,60 @@ button{
 border-height: 0px;
 image-position:center;
 border-bottom:10px;
-color:white;
+
 }        
-		</style>
+form{color:white;}
+		</style>                                      
 	</head> 
 	<body>
 		
 		
 		
 		<div id="stage">
-		<p>Hello <?php Print "$username"?>!</p> <br>
+		<p>Hello <?php Print "$user"?>!</p> <br>
 	    <p>my contacs<p>
+         
+		 
+		 <table border="1px" width="100%">
+			<tr>
+				<th>Id</th>
+				<th>NAME</th>
+				
+				
+				
+				
+				<th>Phone</th>
+			</tr>
+			<?php
+				mysql_connect("localhost", "root","") or die(mysql_error()); //Connect to server
+				mysql_select_db("first_db") or die("Cannot connect to database"); //connect to database
+				$query = mysql_query("Select * from contacts"); // SQL Query
+				while($row = mysql_fetch_array($query))
+				{
+					Print "<tr>";
+						Print '<td align="center">'. $row['id'] . "</td>";
+						Print '<td align="center">'. $row['name'] . "</td>";
+						Print '<td align="center">'. $row['phone']. "</td>";
+						Print '<td align="center"><a href="edit.php?id='. $row['id'] .'">edit</a> </td>';
+						Print '<td align="center"><a href="#" onclick="myFunction('.$row['id'].')">delete</a> </td>';
+					Print "</tr>";
+				}
+			?>
+		 
+		 
+		 
+		 
+		 
+		 
+		 
+		 
 		<form action="home.php" method="post">
 		 name:
-<input type="text" name="name">
-<br>
+<input type="text" name="name" required="required">
+&nbsp
 phone:
-<input type="tel" name="phone">
-<input type="submit" value="submit">
+<input type="tel" name="phone" required="required">&nbsp
+<input type="submit" value="Add" >
 		</form>
 		<a href="logout.php" ><button> </button></a>
          
