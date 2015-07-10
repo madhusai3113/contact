@@ -4,12 +4,12 @@
 	</head>
 	<?php
 	session_start(); //starts the session
-	if($_SESSION['user']){ //checks if user is logged in
+	if($_SESSION['username']){ //checks if user is logged in
 	}
 	else{
 		header("location:index.php"); // redirects if user is not logged in
 	}
-	$user = $_SESSION['user']; //assigns user value
+	$user = $_SESSION['username']; //assigns user value
 	$id_exists = false;
 	?>
 	<body>
@@ -34,7 +34,7 @@
 					$id_exists = true;
 					mysql_connect("localhost", "root","") or die(mysql_error()); //Connect to server
 					mysql_select_db("first_db") or die("Cannot connect to database"); //connect to database
-					$query = mysql_query("Select * from list Where id='$id'"); // SQL Query
+					$query = mysql_query("Select * from contacts Where id='$id'"); // SQL Query
 					$count = mysql_num_rows($query);
 					if($count > 0)
 					{
@@ -42,10 +42,9 @@
 						{
 							Print "<tr>";
 								Print '<td align="center">'. $row['id'] . "</td>";
-								Print '<td align="center">'. $row['details'] . "</td>";
-								Print '<td align="center">'. $row['date_posted']. " - ". $row['time_posted']."</td>";
-								Print '<td align="center">'. $row['date_edited']. " - ". $row['time_edited']. "</td>";
-								Print '<td align="center">'. $row['public']. "</td>";
+								Print '<td align="center">'. $row['name'] . "</td>";
+								
+								Print '<td align="center">'. $row['phone']. "</td>";
 							Print "</tr>";
 						}
 					}
@@ -62,9 +61,9 @@
 		{
 		Print '
 		<form action="edit.php" method="POST">
-			Enter new detail: <input type="text" name="details"/><br/>
-			public post? <input type="checkbox" name="public[]" value="yes"/><br/>
-			<input type="submit" value="Update List"/>
+			Enter new name: <input type="text" name="name"/><br/>
+			`new phone:<input type="tel" name="phone"/>
+			<input type="submit" value="Update"/>
 		</form>
 		';
 		}
@@ -81,19 +80,11 @@
 	{
 		mysql_connect("localhost", "root","") or die(mysql_error()); //Connect to server
 		mysql_select_db("first_db") or die("Cannot connect to database"); //Connect to database
-		$details = mysql_real_escape_string($_POST['details']);
-		$public = "no";
-		$id = $_SESSION['id'];
-		$time = strftime("%X");//time
-		$date = strftime("%B %d, %Y");//date
-		foreach($_POST['public'] as $list)
-		{
-			if($list != null)
-			{
-				$public = "yes";
-			}
-		}
-		mysql_query("UPDATE list SET details='$details', public='$public', date_edited='$date', time_edited='$time' WHERE id='$id'") ;
+		$name = mysql_real_escape_string($_POST['name']);
+        $phone = mysql_real_escape_string($_POST['phone']);
+		
+		
+		mysql_query("UPDATE contacts SET name='$name',phone='$phone' ") ;
 		header("location: home.php");
 	}
 ?>
